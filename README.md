@@ -5,5 +5,7 @@ Piet is an esoteric programming language. The program code is written in an imag
 Every hue/light change between the "codels" has a different command.
 
 Learn more about Piet here:
+
 [Piet, Esoteric programming](http://www.dangermouse.net/esoteric/piet.html)
+
 [Piet Explained](http://www.dangermouse.net/esoteric/piet.html)
