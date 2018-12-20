@@ -8,6 +8,6 @@ Learn more about Piet here:
 
 [Piet, Esoteric programming](http://www.dangermouse.net/esoteric/piet.html)
 
-![](https://github.com/xSillusx/PietSharp/blob/master/helloWorldPiet.jpg)
+![](https://github.com/xSillusx/PietSharp/blob/master/helloWorldPiet.png)
 
 *Piet Hello World Example*
