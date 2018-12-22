@@ -55,6 +55,10 @@ namespace PietSharp
         public int POINTER_X { get; set; } = 0;
         public int POINTER_Y { get; set; } = 0;
 
+        public int CODEL_WIDTH { get; set; }
+        public int CODEL_HEIGHT { get; set; }
+
+
         public PietInterpret(string filepath)
         {
             PietFile = new Bitmap(filepath);
@@ -63,41 +67,73 @@ namespace PietSharp
 
         public void Start()
         {
-            // === program execution === 
-            // set codelSize to correspond to the size of the colored blocks
-            // create a way to determine where the DIRECTION_POINTER AND CODEL_CHOOSER moves
-            // add numbers to stack
-            // black blocks and edges
-            // white blocks
-            // commands
             Console.Write("Codel Width: ");
-            int codelWidth = Convert.ToInt32(Console.ReadLine());
+            CODEL_WIDTH = Convert.ToInt32(Console.ReadLine());
 
             Console.Write("Codel height: ");
-            int codelHeight = Convert.ToInt32(Console.ReadLine());
+            CODEL_HEIGHT = Convert.ToInt32(Console.ReadLine());
 
             // read every codel and save color into color canvas
-            for(int codel_y = 0; codel_y < PietFile.Size.Height; codel_y += codelHeight)
+            for(int codel_y = 0; codel_y < PietFile.Size.Height; codel_y += CODEL_HEIGHT)
             {
-                for(int codel_x = 0; codel_x < PietFile.Size.Width; codel_x+=codelWidth)
+                for(int codel_x = 0; codel_x < PietFile.Size.Width; codel_x+= CODEL_WIDTH)
                 {
-                    Color middlePixel = PietFile.GetPixel(codel_x + codelWidth / 2, codel_y + codelHeight / 2);
-                    PietCode.Add(new CODEL(codel_x, codel_y, middlePixel));
+                    Color middlePixel = PietFile.GetPixel(codel_x + CODEL_WIDTH / 2, codel_y + CODEL_HEIGHT / 2);
+                    CODEL newCodel = new CODEL(codel_x, codel_y, middlePixel);
+                    PietCode.Add(newCodel);
+                    Console.Write(newCodel.COLOR_NAME.ToString()[0]);
+                }
+                Console.WriteLine("");
+            }
+
+            //while(CURRENT_ATTEMPTS < 8)
+            //{
+                CODEL currentCodel = PietCode.Where(x => x.INDEX_X == POINTER_X && x.INDEX_Y == POINTER_Y).FirstOrDefault();
+
+                var test = GetBlockInteger(currentCodel.HEXCOLOR);
+                Console.WriteLine(test);
+            //}
+        }
+
+        private void TurnDPClockwise()
+        {
+            switch(DIRECTION_POINTER)
+            {
+                case DP.DOWN:
+                    DIRECTION_POINTER = DP.LEFT;
+                    break;
+                case DP.LEFT:
+                    DIRECTION_POINTER = DP.UP;
+                    break;
+                case DP.UP:
+                    DIRECTION_POINTER = DP.RIGHT;
+                    break;
+                case DP.RIGHT:
+                    DIRECTION_POINTER = DP.DOWN;
+                    break;
+            }
+        }
+
+        private int GetBlockInteger(string colorToCheck)
+        {
+            int blockSize = -1;
+
+            // scan for region size
+            for(int y = 0; y < PietFile.Size.Height; y+=CODEL_HEIGHT)
+            {
+                for(int x = 0; x < PietFile.Size.Width; x+= CODEL_WIDTH)
+                {
+                    if(PietCode.Where(i=>i.INDEX_X == x && i.INDEX_Y == y).FirstOrDefault().HEXCOLOR == colorToCheck)
+                    {
+                        blockSize += 1;
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
-
-            while(CURRENT_ATTEMPTS < 8)
-            {
-
-            }
-
-
-
-
-
-
-
-
+            return blockSize;
         }
 
 
