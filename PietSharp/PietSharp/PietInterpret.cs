@@ -67,11 +67,26 @@ namespace PietSharp
 
         public void Start()
         {
+           
+
             Console.Write("Codel Width: ");
             CODEL_WIDTH = Convert.ToInt32(Console.ReadLine());
 
             Console.Write("Codel height: ");
             CODEL_HEIGHT = Convert.ToInt32(Console.ReadLine());
+
+            for(int y = 0; y < PietFile.Size.Height; y+=CODEL_HEIGHT)
+            {
+                for(int x = 0; x < PietFile.Size.Width; x+=CODEL_WIDTH)
+                {
+                    int x1 = x + CODEL_WIDTH / 2;
+                    int y1 = y + CODEL_HEIGHT / 2;
+
+                    var pixel = PietFile.GetPixel(x1, y1);
+                    Console.WriteLine(pixel.Name);
+                }
+            }
+
 
             // read every codel and save color into color canvas
             for(int codel_y = 0; codel_y < PietFile.Size.Height; codel_y += CODEL_HEIGHT)

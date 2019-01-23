@@ -14,8 +14,9 @@ namespace PietSharp
         {
             Console.WriteLine("PietSharp v" + buildVersion);
             Console.WriteLine("===============");
-            Console.Write("Path to piet code: ");
-            string inputPath = Console.ReadLine();
+            //Console.Write("Path to piet code: ");
+            //string inputPath = Console.ReadLine();
+            string inputPath = @"C: \Users\user\Documents\GitHub\PietSharp\helloWorldPiet.png";
             PietInterpret interpret = new PietInterpret(inputPath);
             interpret.Start();
             Console.ReadKey();
