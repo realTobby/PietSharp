@@ -12,9 +12,7 @@ namespace PietSharp
         public string HEXCOLOR { get; set; }
         public int INDEX_X { get; set; }
         public int INDEX_Y { get; set; }
-
         public int BLOCK_SIZE_COUNT { get; set; }
-
         public HUE_CYCLE COLOR_NAME { get; set; }
         public LIGHT_CYCLE LIGHT { get; set; }
 
@@ -23,7 +21,6 @@ namespace PietSharp
             INDEX_X = x;
             INDEX_Y = y;
             HEXCOLOR = c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
-
             DiffColorNameAndLight();
         }
 
@@ -43,7 +40,6 @@ namespace PietSharp
                     COLOR_NAME = HUE_CYCLE.RED;
                     LIGHT = LIGHT_CYCLE.DARK;
                     break;
-
                 case "FFFFC0":
                     COLOR_NAME = HUE_CYCLE.YELLOW;
                     LIGHT = LIGHT_CYCLE.LIGHT;
@@ -56,7 +52,6 @@ namespace PietSharp
                     COLOR_NAME = HUE_CYCLE.YELLOW;
                     LIGHT = LIGHT_CYCLE.DARK;
                     break;
-
                 case "C0FFC0":
                     COLOR_NAME = HUE_CYCLE.GREEN;
                     LIGHT = LIGHT_CYCLE.LIGHT;
@@ -69,7 +64,6 @@ namespace PietSharp
                     COLOR_NAME = HUE_CYCLE.GREEN;
                     LIGHT = LIGHT_CYCLE.DARK;
                     break;
-
                 case "C0FFFF":
                     COLOR_NAME = HUE_CYCLE.CYAN;
                     LIGHT = LIGHT_CYCLE.LIGHT;
@@ -82,7 +76,6 @@ namespace PietSharp
                     COLOR_NAME = HUE_CYCLE.CYAN;
                     LIGHT = LIGHT_CYCLE.DARK;
                     break;
-
                 case "C0C0FF":
                     COLOR_NAME = HUE_CYCLE.BLUE;
                     LIGHT = LIGHT_CYCLE.LIGHT;
@@ -95,7 +88,6 @@ namespace PietSharp
                     COLOR_NAME = HUE_CYCLE.BLUE;
                     LIGHT = LIGHT_CYCLE.DARK;
                     break;
-
                 case "FFC0FF":
                     COLOR_NAME = HUE_CYCLE.MAGENTA;
                     LIGHT = LIGHT_CYCLE.LIGHT;

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace PietSharp
 {
-    enum DP
+    enum DP_DIRECTION
     {
         RIGHT,
         LEFT,
@@ -15,7 +15,7 @@ namespace PietSharp
         DOWN,
     }
 
-    enum CC
+    enum CC_DIRECTION
     {
         RIGHT,
         LEFT
@@ -43,115 +43,72 @@ namespace PietSharp
     class PietInterpret
     {
         public Stack<int> stack = new Stack<int>();
-        public Bitmap PietFile { get; set; }
-
+        public Bitmap ENLARGED_PIET { get; set; }
+        public Bitmap RESIZED_PIET { get; set; }
         public List<CODEL> PietCode { get; set; }
-
-        public int CURRENT_ATTEMPTS = 0;
-
-        public DP DIRECTION_POINTER { get; set; } = DP.RIGHT;
-        public CC CODEL_CHOOSER { get; set; } = CC.LEFT;
-
         public int POINTER_X { get; set; } = 0;
         public int POINTER_Y { get; set; } = 0;
-
         public int CODEL_WIDTH { get; set; }
         public int CODEL_HEIGHT { get; set; }
+        public DP_DIRECTION DIRECTION_POINTER { get; set; } = DP_DIRECTION.RIGHT;
+        public CC_DIRECTION CODEL_CHOOSER { get; set; } = CC_DIRECTION.LEFT;
 
-
-        public PietInterpret(string filepath)
+        public PietInterpret(string pietPath)
         {
-            PietFile = new Bitmap(filepath);
+            LoadPietFile(pietPath);
             PietCode = new List<CODEL>();
+        }
+
+        public void LoadPietFile(string filepath)
+        {
+            ENLARGED_PIET = new Bitmap(filepath);
+        }
+
+        public void ShrinkPietFile()
+        {
+            Bitmap resizedPiet = new Bitmap((ENLARGED_PIET.Width / CODEL_WIDTH), (ENLARGED_PIET.Height / CODEL_HEIGHT));
+            int ry = 0;
+            int rx = 0;
+
+            for (int codel_y = 0; codel_y < ENLARGED_PIET.Size.Height; codel_y += CODEL_HEIGHT)
+            {
+                for (int codel_x = 0; codel_x < ENLARGED_PIET.Size.Width; codel_x += CODEL_WIDTH)
+                {
+                    Color currentCodel = ENLARGED_PIET.GetPixel(codel_x + (CODEL_WIDTH / 2), codel_y + (CODEL_HEIGHT / 2));
+                    resizedPiet.SetPixel(rx, ry, currentCodel);
+                    rx += 1;
+                    if (rx >= resizedPiet.Width)
+                        rx = 0;
+                }
+                ry += 1;
+                if (ry >= resizedPiet.Height)
+                    ry = 0;
+            }
+            resizedPiet.Save("resizedPIET.png");
+            RESIZED_PIET = resizedPiet;
         }
 
         public void Start()
         {
-           
-
             Console.Write("Codel Width: ");
             CODEL_WIDTH = Convert.ToInt32(Console.ReadLine());
 
             Console.Write("Codel height: ");
             CODEL_HEIGHT = Convert.ToInt32(Console.ReadLine());
 
-            for(int y = 0; y < PietFile.Size.Height; y+=CODEL_HEIGHT)
-            {
-                for(int x = 0; x < PietFile.Size.Width; x+=CODEL_WIDTH)
-                {
-                    int x1 = x + CODEL_WIDTH / 2;
-                    int y1 = y + CODEL_HEIGHT / 2;
-
-                    var pixel = PietFile.GetPixel(x1, y1);
-                    Console.WriteLine(pixel.Name);
-                }
-            }
-
-
-            // read every codel and save color into color canvas
-            for(int codel_y = 0; codel_y < PietFile.Size.Height; codel_y += CODEL_HEIGHT)
-            {
-                for(int codel_x = 0; codel_x < PietFile.Size.Width; codel_x+= CODEL_WIDTH)
-                {
-                    Color middlePixel = PietFile.GetPixel(codel_x + CODEL_WIDTH / 2, codel_y + CODEL_HEIGHT / 2);
-                    CODEL newCodel = new CODEL(codel_x, codel_y, middlePixel);
-                    PietCode.Add(newCodel);
-                    Console.Write(newCodel.COLOR_NAME.ToString()[0]);
-                }
-                Console.WriteLine("");
-            }
-
-            //while(CURRENT_ATTEMPTS < 8)
-            //{
-                CODEL currentCodel = PietCode.Where(x => x.INDEX_X == POINTER_X && x.INDEX_Y == POINTER_Y).FirstOrDefault();
-
-                var test = GetBlockInteger(currentCodel.HEXCOLOR);
-                Console.WriteLine(test);
-            //}
+            ShrinkPietFile();
+            ReadPiet();
         }
 
-        private void TurnDPClockwise()
+        private void ReadPiet()
         {
-            switch(DIRECTION_POINTER)
+            for(int y = 0; y < RESIZED_PIET.Height; y++)
             {
-                case DP.DOWN:
-                    DIRECTION_POINTER = DP.LEFT;
-                    break;
-                case DP.LEFT:
-                    DIRECTION_POINTER = DP.UP;
-                    break;
-                case DP.UP:
-                    DIRECTION_POINTER = DP.RIGHT;
-                    break;
-                case DP.RIGHT:
-                    DIRECTION_POINTER = DP.DOWN;
-                    break;
-            }
-        }
-
-        private int GetBlockInteger(string colorToCheck)
-        {
-            int blockSize = -1;
-
-            // scan for region size
-            for(int y = 0; y < PietFile.Size.Height; y+=CODEL_HEIGHT)
-            {
-                for(int x = 0; x < PietFile.Size.Width; x+= CODEL_WIDTH)
+                for(int x = 0; x < RESIZED_PIET.Width; x++)
                 {
-                    if(PietCode.Where(i=>i.INDEX_X == x && i.INDEX_Y == y).FirstOrDefault().HEXCOLOR == colorToCheck)
-                    {
-                        blockSize += 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    PietCode.Add(new CODEL(x, y, RESIZED_PIET.GetPixel(x, y)));
                 }
             }
-            return blockSize;
         }
-
-
-
     }
 }
