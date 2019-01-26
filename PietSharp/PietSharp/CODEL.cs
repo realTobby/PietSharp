@@ -34,7 +34,7 @@ namespace PietSharp
         public int BLOCK_SIZE_COUNT { get; set; }
         public HUE_CYCLE COLOR_NAME { get; set; }
         public LIGHT_CYCLE LIGHT { get; set; }
-        public bool COLORBLOCKCHECK { get; set; }
+        public bool NEIGHBOURCHECK { get; set; } = false;
 
         public CODEL(int x, int y, Color c)
         {
@@ -52,7 +52,7 @@ namespace PietSharp
                     COLOR_NAME = HUE_CYCLE.RED;
                     LIGHT = LIGHT_CYCLE.LIGHT;
                     break;
-                case "FF0000":
+                case "FE0000":
                     COLOR_NAME = HUE_CYCLE.RED;
                     LIGHT = LIGHT_CYCLE.NORMAL;
                     break;

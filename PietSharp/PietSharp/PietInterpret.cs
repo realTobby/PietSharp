@@ -31,8 +31,7 @@ namespace PietSharp
             Console.Write("Codel height: ");
             CODEL_HEIGHT = Convert.ToInt32(Console.ReadLine());
 
-            ShrinkPietFile();
-            ReadPiet();
+            ReadPietCode();
             PIET_POINTER = new POINTER(0,0,CC_DIRECTION.LEFT, DP_DIRECTION.RIGHT);
             ExecutePiet();
 
@@ -51,55 +50,73 @@ namespace PietSharp
         private List<CODEL> GetColorBlock(CODEL firstCodel)
         {
             List<CODEL> result = new List<CODEL>();
-
-            int colorBlockIndex = 0;
-
-            firstCodel.COLORBLOCKCHECK = true;
+            firstCodel.NEIGHBOURCHECK = false;
             result.Add(firstCodel);
 
-            while(result.Count > colorBlockIndex)
+            while (result.Where(x=>x.NEIGHBOURCHECK == false) != null)
             {
-                int colorBlockX = result[colorBlockIndex].POSITION_X;
-                int colorBlockY = result[colorBlockIndex].POSITION_Y;
+                var neighbours = GetCodelNeighbours(result.First(x => x.NEIGHBOURCHECK == false));
 
-                for (int y = colorBlockY; y < RESIZED_PIET.Height / CODEL_HEIGHT; y++)
-                {
-                    for (int x = colorBlockX; x < RESIZED_PIET.Width / CODEL_WIDTH; x++)
-                    {
-                        // get neighbours
-                        if (y -1 > 0)
-                        {
-                            var topCodel = PietCode.Where(pietFinder => pietFinder.POSITION_X == x && pietFinder.POSITION_Y == y - 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
-                            if (topCodel != null)
-                                result.Add(topCodel);
-                        }
-                        if (x - 1 > 0)
-                        {
-                            var leftCodel = PietCode.Where(pietFinder => pietFinder.POSITION_Y == y && pietFinder.POSITION_X == x - 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
-                            if (leftCodel != null)
-                                result.Add(leftCodel);
-                        }
-                        if (x + 1 < RESIZED_PIET.Width / CODEL_WIDTH)
-                        {
-                            var rightCodel = PietCode.Where(pietFinder => pietFinder.POSITION_Y == y && pietFinder.POSITION_X == x + 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
-                            if (rightCodel != null)
-                                result.Add(rightCodel);
-                        }
-                        if (y + 1 < RESIZED_PIET.Height / CODEL_HEIGHT)
-                        {
-                            var downCodel = PietCode.Where(pietFinder => pietFinder.POSITION_X == x && pietFinder.POSITION_Y == y + 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
-                            if (downCodel != null)
-                                result.Add(downCodel);
-                        }
-                    }
-                }
 
-                if (result.Count > colorBlockIndex)
-                {
-                    colorBlockIndex++;
-                }
+                var noDupeNeighbours = neighbours.Distinct().ToList();
+
+
+                result.AddRange(noDupeNeighbours);
+
+
+
+                int max = result.Count();
+                int diff = max - neighbours.Count();
+
+                result[diff - 1].NEIGHBOURCHECK = true;
+
+
             }
             return result;
+        }
+
+        private List<CODEL> GetCodelNeighbours(CODEL firstCodel)
+        {
+            List<CODEL> neighbours = new List<CODEL>();
+            int x = firstCodel.POSITION_X;
+            int y = firstCodel.POSITION_Y;
+            string hexColor = firstCodel.HEXCOLOR;
+            LIGHT_CYCLE light = firstCodel.LIGHT;
+
+
+
+            if(x > 0)
+            {
+                CODEL leftNeighbour = PietCode.Where(codel => codel.POSITION_X == x -1 && codel.POSITION_Y == y && codel.HEXCOLOR == hexColor && codel.LIGHT == light).FirstOrDefault();
+                if (leftNeighbour != null)
+                {
+                    neighbours.Add(leftNeighbour);
+                }
+                    
+            }
+            if(x < RESIZED_PIET.Width)
+            {
+                CODEL rightNeighbour = PietCode.Where(codel => codel.POSITION_X == x +1 && codel.POSITION_Y == y && codel.HEXCOLOR == hexColor && codel.LIGHT == light).FirstOrDefault();
+                if (rightNeighbour != null)
+                    neighbours.Add(rightNeighbour);
+            }
+
+            if (y > 0)
+            {
+                CODEL topNeighbour = PietCode.Where(codel => codel.POSITION_X == x && codel.POSITION_Y == y - 1 && codel.HEXCOLOR == hexColor && codel.LIGHT == light).FirstOrDefault();
+                if (topNeighbour != null)
+                    neighbours.Add(topNeighbour);
+            }
+
+            if (y < RESIZED_PIET.Height)
+            {
+                CODEL downNeighbour = PietCode.Where(codel => codel.POSITION_X == x && codel.POSITION_Y == y + 1 && codel.HEXCOLOR == hexColor && codel.LIGHT == light).FirstOrDefault();
+                if (downNeighbour != null)
+                    neighbours.Add(downNeighbour);
+            }
+
+            return neighbours;
+
         }
 
         public void LoadPietFile(string filepath)
@@ -107,7 +124,7 @@ namespace PietSharp
             ENLARGED_PIET = new Bitmap(filepath);
         }
 
-        public void ShrinkPietFile()
+        public void ReadPietCode()
         {
             Bitmap resizedPiet = new Bitmap((ENLARGED_PIET.Width / CODEL_WIDTH), (ENLARGED_PIET.Height / CODEL_HEIGHT));
             int ry = 0;
@@ -119,6 +136,7 @@ namespace PietSharp
                 {
                     Color currentCodel = ENLARGED_PIET.GetPixel(codel_x + (CODEL_WIDTH / 2), codel_y + (CODEL_HEIGHT / 2));
                     resizedPiet.SetPixel(rx, ry, currentCodel);
+                    PietCode.Add(new CODEL(rx, ry, currentCodel));
                     rx += 1;
                     if (rx >= resizedPiet.Width)
                         rx = 0;
@@ -129,19 +147,6 @@ namespace PietSharp
             }
             resizedPiet.Save("resizedPIET.png");
             RESIZED_PIET = resizedPiet;
-        }
-
-        
-
-        private void ReadPiet()
-        {
-            for(int y = 0; y < RESIZED_PIET.Height; y++)
-            {
-                for(int x = 0; x < RESIZED_PIET.Width; x++)
-                {
-                    PietCode.Add(new CODEL(x, y, RESIZED_PIET.GetPixel(x, y)));
-                }
-            }
         }
     }
 }
