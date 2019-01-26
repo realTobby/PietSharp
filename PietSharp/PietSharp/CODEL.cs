@@ -7,19 +7,39 @@ using System.Threading.Tasks;
 
 namespace PietSharp
 {
+    public enum HUE_CYCLE
+    {
+        RED,
+        YELLOW,
+        GREEN,
+        CYAN,
+        BLUE,
+        MAGENTA,
+        WHITE,
+        BLACK
+    }
+
+    public enum LIGHT_CYCLE
+    {
+        LIGHT,
+        NORMAL,
+        DARK
+    }
+
     public class CODEL
     {
         public string HEXCOLOR { get; set; }
-        public int INDEX_X { get; set; }
-        public int INDEX_Y { get; set; }
+        public int POSITION_X { get; set; }
+        public int POSITION_Y { get; set; }
         public int BLOCK_SIZE_COUNT { get; set; }
         public HUE_CYCLE COLOR_NAME { get; set; }
         public LIGHT_CYCLE LIGHT { get; set; }
+        public bool COLORBLOCKCHECK { get; set; }
 
         public CODEL(int x, int y, Color c)
         {
-            INDEX_X = x;
-            INDEX_Y = y;
+            POSITION_X = x;
+            POSITION_Y = y;
             HEXCOLOR = c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2");
             DiffColorNameAndLight();
         }

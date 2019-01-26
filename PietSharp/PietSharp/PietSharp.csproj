@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="CODEL.cs" />
     <Compile Include="PietInterpret.cs" />
+    <Compile Include="POINTER.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

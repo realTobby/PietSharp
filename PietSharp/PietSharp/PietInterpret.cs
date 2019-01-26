@@ -7,56 +7,99 @@ using System.Threading.Tasks;
 
 namespace PietSharp
 {
-    enum DP_DIRECTION
-    {
-        RIGHT,
-        LEFT,
-        UP,
-        DOWN,
-    }
-
-    enum CC_DIRECTION
-    {
-        RIGHT,
-        LEFT
-    }
-
-    public enum HUE_CYCLE
-    {
-        RED,
-        YELLOW,
-        GREEN,
-        CYAN,
-        BLUE,
-        MAGENTA,
-        WHITE,
-        BLACK
-    }
-
-    public enum LIGHT_CYCLE
-    {
-        LIGHT,
-        NORMAL,
-        DARK
-    }
-
     class PietInterpret
     {
-        public Stack<int> stack = new Stack<int>();
         public Bitmap ENLARGED_PIET { get; set; }
         public Bitmap RESIZED_PIET { get; set; }
         public List<CODEL> PietCode { get; set; }
-        public int POINTER_X { get; set; } = 0;
-        public int POINTER_Y { get; set; } = 0;
         public int CODEL_WIDTH { get; set; }
         public int CODEL_HEIGHT { get; set; }
-        public DP_DIRECTION DIRECTION_POINTER { get; set; } = DP_DIRECTION.RIGHT;
-        public CC_DIRECTION CODEL_CHOOSER { get; set; } = CC_DIRECTION.LEFT;
-
+        public POINTER PIET_POINTER { get; set; }
+        
         public PietInterpret(string pietPath)
         {
             LoadPietFile(pietPath);
             PietCode = new List<CODEL>();
+
+        }
+
+        public void Start()
+        {
+            Console.Write("Codel Width: ");
+            CODEL_WIDTH = Convert.ToInt32(Console.ReadLine());
+
+            Console.Write("Codel height: ");
+            CODEL_HEIGHT = Convert.ToInt32(Console.ReadLine());
+
+            ShrinkPietFile();
+            ReadPiet();
+            PIET_POINTER = new POINTER(0,0,CC_DIRECTION.LEFT, DP_DIRECTION.RIGHT);
+            ExecutePiet();
+
+        }
+
+        private void ExecutePiet()
+        {
+            CODEL firstCodel = PietCode.Where(pietFinder => pietFinder.POSITION_X == PIET_POINTER.POSITION_X && pietFinder.POSITION_Y == PIET_POINTER.POSITION_Y).FirstOrDefault();
+
+            List<CODEL> CURRENT_COLOR_BLOCK = new List<CODEL>();
+
+            CURRENT_COLOR_BLOCK = GetColorBlock(firstCodel);
+
+        }
+
+        private List<CODEL> GetColorBlock(CODEL firstCodel)
+        {
+            List<CODEL> result = new List<CODEL>();
+
+            int colorBlockIndex = 0;
+
+            firstCodel.COLORBLOCKCHECK = true;
+            result.Add(firstCodel);
+
+            while(result.Count > colorBlockIndex)
+            {
+                int colorBlockX = result[colorBlockIndex].POSITION_X;
+                int colorBlockY = result[colorBlockIndex].POSITION_Y;
+
+                for (int y = colorBlockY; y < RESIZED_PIET.Height / CODEL_HEIGHT; y++)
+                {
+                    for (int x = colorBlockX; x < RESIZED_PIET.Width / CODEL_WIDTH; x++)
+                    {
+                        // get neighbours
+                        if (y -1 > 0)
+                        {
+                            var topCodel = PietCode.Where(pietFinder => pietFinder.POSITION_X == x && pietFinder.POSITION_Y == y - 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
+                            if (topCodel != null)
+                                result.Add(topCodel);
+                        }
+                        if (x - 1 > 0)
+                        {
+                            var leftCodel = PietCode.Where(pietFinder => pietFinder.POSITION_Y == y && pietFinder.POSITION_X == x - 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
+                            if (leftCodel != null)
+                                result.Add(leftCodel);
+                        }
+                        if (x + 1 < RESIZED_PIET.Width / CODEL_WIDTH)
+                        {
+                            var rightCodel = PietCode.Where(pietFinder => pietFinder.POSITION_Y == y && pietFinder.POSITION_X == x + 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
+                            if (rightCodel != null)
+                                result.Add(rightCodel);
+                        }
+                        if (y + 1 < RESIZED_PIET.Height / CODEL_HEIGHT)
+                        {
+                            var downCodel = PietCode.Where(pietFinder => pietFinder.POSITION_X == x && pietFinder.POSITION_Y == y + 1 && pietFinder.HEXCOLOR == firstCodel.HEXCOLOR).FirstOrDefault();
+                            if (downCodel != null)
+                                result.Add(downCodel);
+                        }
+                    }
+                }
+
+                if (result.Count > colorBlockIndex)
+                {
+                    colorBlockIndex++;
+                }
+            }
+            return result;
         }
 
         public void LoadPietFile(string filepath)
@@ -88,17 +131,7 @@ namespace PietSharp
             RESIZED_PIET = resizedPiet;
         }
 
-        public void Start()
-        {
-            Console.Write("Codel Width: ");
-            CODEL_WIDTH = Convert.ToInt32(Console.ReadLine());
-
-            Console.Write("Codel height: ");
-            CODEL_HEIGHT = Convert.ToInt32(Console.ReadLine());
-
-            ShrinkPietFile();
-            ReadPiet();
-        }
+        
 
         private void ReadPiet()
         {
