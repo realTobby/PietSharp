@@ -18,6 +18,9 @@ namespace PietSharp
         
         public PietInterpret(string pietPath)
         {
+
+            // comment to make changes lolol
+
             LoadPietFile(pietPath);
             PietCode = new List<CODEL>();
 
@@ -40,11 +43,8 @@ namespace PietSharp
         private void ExecutePiet()
         {
             CODEL firstCodel = PietCode.Where(pietFinder => pietFinder.POSITION_X == PIET_POINTER.POSITION_X && pietFinder.POSITION_Y == PIET_POINTER.POSITION_Y).FirstOrDefault();
-
             List<CODEL> CURRENT_COLOR_BLOCK = new List<CODEL>();
-
             CURRENT_COLOR_BLOCK = GetColorBlock(firstCodel);
-
         }
 
         private List<CODEL> GetColorBlock(CODEL firstCodel)
@@ -83,8 +83,6 @@ namespace PietSharp
             string hexColor = firstCodel.HEXCOLOR;
             LIGHT_CYCLE light = firstCodel.LIGHT;
 
-
-
             if(x > 0)
             {
                 CODEL leftNeighbour = PietCode.Where(codel => codel.POSITION_X == x -1 && codel.POSITION_Y == y && codel.HEXCOLOR == hexColor && codel.LIGHT == light).FirstOrDefault();
@@ -114,9 +112,7 @@ namespace PietSharp
                 if (downNeighbour != null)
                     neighbours.Add(downNeighbour);
             }
-
             return neighbours;
-
         }
 
         public void LoadPietFile(string filepath)
@@ -129,7 +125,6 @@ namespace PietSharp
             Bitmap resizedPiet = new Bitmap((ENLARGED_PIET.Width / CODEL_WIDTH), (ENLARGED_PIET.Height / CODEL_HEIGHT));
             int ry = 0;
             int rx = 0;
-
             for (int codel_y = 0; codel_y < ENLARGED_PIET.Size.Height; codel_y += CODEL_HEIGHT)
             {
                 for (int codel_x = 0; codel_x < ENLARGED_PIET.Size.Width; codel_x += CODEL_WIDTH)
